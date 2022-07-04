@@ -12,15 +12,20 @@ module.exports = app => {
       { usernameField: 'email', passReqToCallback: true },
       async (req, email, password, done) => {
         try {
-          console.log(email)
           const user = await User.findOne({ where: { email } })
           if (!user) {
-            return done(null, false, {
-              message: 'that email is not registered'
-            })
+            return done(
+              null,
+              false,
+              req.flash('warning_msg', '驗證失敗，Email或Password錯誤')
+            )
           }
           if (!bcrypt.compareSync(password, user.password)) {
-            return done(null, false, { message: 'email or password incorrect' })
+            return done(
+              null,
+              false,
+              req.flash('warning_msg', '驗證失敗，Email或Password錯誤')
+            )
           }
           return done(null, user)
         } catch (err) {
@@ -35,7 +40,7 @@ module.exports = app => {
   passport.deserializeUser(async (id, done) => {
     try {
       const user = await User.findByPk(id)
-      done(null, user.dataValues)
+      return done(null, user.dataValues)
     } catch (err) {
       console.log(err)
     }
