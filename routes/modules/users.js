@@ -48,10 +48,11 @@ router.post('/register', async (req, res) => {
         confirmPassword
       })
     } else {
+      const hash = bcrypt.hashSync(password, bcrypt.genSaltSync(10), null)
       await User.create({
         name,
         email,
-        password: bcrypt.hashSync(password, bcrypt.genSaltSync)
+        password: hash
       })
       return res.redirect('/')
     }
@@ -60,7 +61,7 @@ router.post('/register', async (req, res) => {
   }
 })
 
-router.get('logout', (req, res) => {
+router.get('/logout', (req, res) => {
   req.logout(err => {
     if (err) {
       return console.log(err)
